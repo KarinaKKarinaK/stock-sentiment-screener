@@ -1,8 +1,10 @@
 import requests
 from bs4 import BeautifulSoup
 import datetime
+import yfinance as yf
+import ta
 
-def get_ahoo_finance_headlines(stock_ticker, limit: int = 10) -> list[str]:
+def get_yahoo_finance_headlines(stock_ticker, limit: int = 10) -> list[str]:
     url = f"https://finance.yahoo.com/quote/{stock_ticker}?p={stock_ticker}"
     response = requests.get(url)
     soup = BeautifulSoup(response.text, 'html.parser')
@@ -24,3 +26,24 @@ def make_signal(sentiments: list[str]) -> str:
         return "SELL"
     else:
         return "HOLD"
+
+def get_rsi_signal(stock_ticker: str) -> str:
+    df = yf.download(stock_ticker, period="1mo", interval="1d")
+    df["rsi"] = ta.momentum.RSIIndicator(df["Close"]).rsi()
+
+    last_rsi = df["rsi"].dropna().iloc[-1]
+
+    if last_rsi < 30:
+        return "BUY"
+    elif last_rsi > 70:
+        return "SELL"
+    else:
+        return "HOLD"
+    
+def get_final_signal(sentiment_signal: str, rsi_signal: str) -> str:
+    if sentiment_signal == "BUY" and rsi_signal == "BUY":
+        return "STRONG BUY"
+    elif sentiment_signal == "SELL" and rsi_signal == "SELL":
+        return "STRONG SELL"
+    else:
+        return "NEUTRAL / CAUTION"
