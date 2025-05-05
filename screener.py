@@ -13,3 +13,14 @@ def get_ahoo_finance_headlines(stock_ticker, limit: int = 10) -> list[str]:
             headlines.append(tag.a.text)
     
     return headlines
+
+def make_signal(sentiments: list[str]) -> str:
+    positive_count = sentiments.count("POSITIVE")
+    negative_count = sentiments.count("NEGATIVE")
+    
+    if positive_count > negative_count + 2:
+        return "BUY"
+    elif negative_count > positive_count+ 2:
+        return "SELL"
+    else:
+        return "HOLD"
