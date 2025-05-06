@@ -1,5 +1,5 @@
 import streamlit as st
-from screener import get_yahoo_finance_headlines, get_final_signal, get_rsi_signal
+from screener import get_yahoo_finance_headlines, get_google_finance_headlines, get_final_signal, get_rsi_signal
 from sentiment import analyze_sentiment
 
 st.title("Stock Screener wih Sentiment Analysis")
@@ -7,8 +7,8 @@ st.title("Stock Screener wih Sentiment Analysis")
 ticker = st.text_input("Enter stock ticker (e.g., AAPL, TSLA):", "AAPL")
 
 if ticker:
-    st.subheader("Latest News Headklines")
-    headlines = get_yahoo_finance_headlines(ticker)
+    st.subheader("Latest News Headlines")
+    headlines = get_google_finance_headlines(ticker)
     for h in headlines:
         st.write("•", h)
 

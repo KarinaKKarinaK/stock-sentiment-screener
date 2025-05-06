@@ -4,6 +4,7 @@ import datetime
 import yfinance as yf
 import ta
 import pandas as pd
+import feedparser
 
 def get_yahoo_finance_headlines(stock_ticker, limit: int = 10) -> list[str]:
     url = f"https://finance.yahoo.com/quote/{stock_ticker}?p={stock_ticker}"
@@ -15,6 +16,12 @@ def get_yahoo_finance_headlines(stock_ticker, limit: int = 10) -> list[str]:
         if tag.a:
             headlines.append(tag.a.text)
     
+    return headlines
+
+def get_google_finance_headlines(ticker: str, limit: int = 10) -> list[str]:
+    url = f"https://news.google.com/rss/search?q={ticker}+stock&hl=en-US&gl=US&ceid=US:en"
+    feed = feedparser.parse(url)
+    headlines = [entry.title for entry in feed.entries[:limit]]
     return headlines
 
 def make_signal(sentiments: list[str]) -> str:
