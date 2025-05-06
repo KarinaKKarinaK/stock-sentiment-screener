@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import datetime
 import yfinance as yf
 import ta
+import pandas as pd
 
 def get_yahoo_finance_headlines(stock_ticker, limit: int = 10) -> list[str]:
     url = f"https://finance.yahoo.com/quote/{stock_ticker}?p={stock_ticker}"
@@ -26,13 +27,21 @@ def make_signal(sentiments: list[str]) -> str:
         return "SELL"
     else:
         return "HOLD"
-
+    
 def get_rsi_signal(stock_ticker: str) -> str:
     df = yf.download(stock_ticker, period="1mo", interval="1d")
-    df["rsi"] = ta.momentum.RSIIndicator(df["Close"]).rsi()
+    df.dropna(inplace=True)
+
+    # Ensuring it is a series rather than a DataFrame
+    close_series = df["Close"]
+    if isinstance(close_series, pd.DataFrame):
+        close_series = close_series.squeeze()
+    
+    rsi_indicator = ta.momentum.RSIIndicator(close=close_series)
+    df["rsi"] = rsi_indicator.rsi()
 
     last_rsi = df["rsi"].dropna().iloc[-1]
-
+    
     if last_rsi < 30:
         return "BUY"
     elif last_rsi > 70:
