@@ -1,5 +1,5 @@
 import streamlit as st
-from screener import get_yahoo_finance_headlines, get_final_signal
+from screener import get_yahoo_finance_headlines, get_final_signal, get_rsi_signal
 from sentiment import analyze_sentiment
 
 st.title("Stock Screener wih Sentiment Analysis")
@@ -18,5 +18,6 @@ if ticker:
         st.write(f"{h} → **{s}**")
 
     st.subheader("Trading Signal")
-    signal = get_final_signal(sentiments)
+    rsi_signal = get_rsi_signal(ticker)
+    signal = get_final_signal(sentiments, rsi_signal)
     st.write(f"### 🚨 {signal}")
